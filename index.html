@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de QR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Espaciado entre botones */
+            margin-bottom: 20px;
+            height: 2.5em;
+            align-items: center;
+
+        }
+        .nav-bar button {
+            padding: 10px 20px; /* Tamaño más compacto */
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .nav-bar button:hover {
+            background-color: #0056b3;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #qr-container {
+            margin-top: 20px;
+        }
+        img {
+            width: 200px;
+            height: 200px;
+        }
+        .panel {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Generador de QR</h2>
+
+    <!-- Barra de navegación mejorada -->
+    <div class="nav-bar">
+        <button onclick="mostrarPanel('texto-panel')">Texto/URL</button>
+        <button onclick="mostrarPanel('wifi-panel')">WiFi</button>
+    </div>
+
+    <!-- Panel para Texto/URL -->
+    <div id="texto-panel" class="container panel active">
+        <label>Texto o URL:</label>
+        <input type="text" id="texto" placeholder="Introduce texto o URL">
+        <button onclick="generarQR()">Generar QR</button>
+    </div>
+
+    <!-- Panel para WiFi -->
+    <div id="wifi-panel" class="container panel">
+        <label>Nombre de la red WiFi:</label>
+        <input type="text" id="ssid" placeholder="SSID">
+        
+        <label>Contraseña:</label>
+        <input type="text" id="password" placeholder="Contraseña WiFi">
+        <button onclick="generarQRWifi()">Generar QR de WiFi</button>
+    </div>
+
+    <div id="qr-container"></div>
+
+    <script>
+        const API_BASE_URL = "https://qr-gen-api-te9f.onrender.com";
+
+        function mostrarPanel(panelId) {
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        function generarQR() {
+            let texto = document.getElementById("texto").value;
+
+            if (!texto) {
+                alert("Por favor, introduce un texto o una URL.");
+                return;
+            }
+
+            let esURL = texto.startsWith("http://") || texto.startsWith("https://");
+            let apiUrl = esURL 
+                ? `${API_BASE_URL}/qr-url?url=${encodeURIComponent(texto)}`
+                : `${API_BASE_URL}/qr-texto?texto=${encodeURIComponent(texto)}`;
+
+            document.getElementById("qr-container").innerHTML = `<img src="${apiUrl}" alt="Código QR">`;
+        }
+
+        function generarQRWifi() {
+            let ssid = document.getElementById("ssid").value;
+            let password = document.getElementById("password").value;
+
+            if (!ssid || !password) {
+                alert("Por favor, ingresa el SSID y la contraseña.");
+                return;
+            }
+
+            let apiUrl = `${API_BASE_URL}/qr-wifi?ssid=${encodeURIComponent(ssid)}&password=${encodeURIComponent(password)}&hidden=false`;
+            document.getElementById("qr-container").innerHTML = `<img src="${apiUrl}" alt="Código QR">`;
+        }
+    </script>
+
+</body>
+</html>
